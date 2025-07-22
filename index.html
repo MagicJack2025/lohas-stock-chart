@@ -168,7 +168,7 @@
     <button onclick="fetchStockData()">繪製圖表</button>
   </div>
   <div id="mainTitle">樂活五線譜</div>
-  <div id="versionInfo">v1.02</div>
+  <div id="versionInfo">v1.01</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
   <div class="container" id="chartContainer">
@@ -275,6 +275,14 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          layout: {
+            padding: {
+              left: 10,
+              right: 20,
+              top: 10,
+              bottom: 10
+            }
+          },
           interaction: {
             intersect: false,
             mode: 'index'
