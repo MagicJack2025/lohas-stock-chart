@@ -520,18 +520,20 @@
               },
               grid: {
                 display: true,
-                color: 'rgba(0,0,0,0.1)',
-                lineWidth: 1,
-                drawOnChartArea: function(context) {
+                color: function(context) {
                   const index = context.index;
                   const totalDays = dates.length;
                   const monthsToShow = selectedYears * 2;
                   const skipRate = Math.floor(totalDays / monthsToShow);
                   const finalSkipRate = Math.max(30, Math.min(180, skipRate));
                   
-                  // 只在有日期標籤的位置顯示格線
-                  return index === 0 || index === totalDays - 1 || index % finalSkipRate === 0;
-                }
+                  // 只在有日期標籤的位置顯示格線，其他位置透明
+                  if (index === 0 || index === totalDays - 1 || index % finalSkipRate === 0) {
+                    return 'rgba(0,0,0,0.1)';
+                  }
+                  return 'rgba(0,0,0,0)'; // 透明，不顯示
+                },
+                lineWidth: 1
               }
             },
             y: { 
