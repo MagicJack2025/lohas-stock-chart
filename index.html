@@ -44,7 +44,7 @@
       display: none;
       margin: 15px 0;
       text-align: center;
-      font-size: clamp(16px, 4vw, 24px);
+      font-size: clamp(18px, 5vw, 28px);
       font-weight: bold;
       color: #003366;
       line-height: 1.2;
@@ -59,7 +59,7 @@
     }
     #statusMessage {
       text-align: center;
-      font-size: clamp(14px, 3.5vw, 18px);
+      font-size: clamp(12px, 3vw, 16px);
       color: #003366;
       font-weight: bold;
       margin: 15px 0;
@@ -70,6 +70,21 @@
     }
     #statusMessage span {
       color: #FF4500;
+    }
+    #dataDate {
+      text-align: center;
+      font-size: clamp(11px, 2.8vw, 14px);
+      color: #666666;
+      font-weight: normal;
+      margin: 5px 0 15px 0;
+      padding: 8px;
+      background-color: #f0f8ff;
+      border-radius: 6px;
+      border-left: 4px solid #007BFF;
+    }
+    #dataDate span {
+      color: #007BFF;
+      font-weight: bold;
     }
     .container {
       width: 100%;
@@ -114,7 +129,7 @@
         min-height: 280px;
       }
       #stockTitle {
-        font-size: 14px;
+        font-size: 16px;
         margin: 10px 0;
       }
       #mainTitle {
@@ -122,9 +137,14 @@
         margin: 15px 0;
       }
       #statusMessage {
-        font-size: 14px;
+        font-size: 12px;
         padding: 8px;
         margin: 10px 0;
+      }
+      #dataDate {
+        font-size: 11px;
+        padding: 6px;
+        margin: 5px 0 10px 0;
       }
     }
     
@@ -134,10 +154,16 @@
         min-height: 250px;
       }
       #stockTitle {
-        font-size: 12px;
+        font-size: 14px;
       }
       #mainTitle {
         font-size: 24px;
+      }
+      #statusMessage {
+        font-size: 11px;
+      }
+      #dataDate {
+        font-size: 10px;
       }
     }
   </style>
@@ -150,6 +176,7 @@
   <div id="mainTitle">樂活五線譜</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
+  <div id="dataDate" style="display: none;"></div>
   <div class="container" id="chartContainer">
     <div class="chart-wrapper">
       <canvas id="stockChart"></canvas>
@@ -208,6 +235,7 @@
 
     function clearPreviousChart() {
       document.getElementById('chartContainer').style.display = "block";
+      document.getElementById('dataDate').style.display = "none";
       if (chartInstance !== null) { chartInstance.destroy(); chartInstance = null; }
       const chartWrapper = document.querySelector('.chart-wrapper');
       const oldCanvas = document.getElementById('stockChart');
@@ -329,7 +357,15 @@
           }
         }
       });
+      
+      // 顯示查詢日期和資料日期
       updateStatus(`查詢日期: <span>${getTodayInTaipei()}</span>`);
+      
+      // 顯示最後一筆資料的日期
+      const lastDataDate = dates[dates.length - 1];
+      const dataDateElement = document.getElementById('dataDate');
+      dataDateElement.innerHTML = `資料日期: <span>${lastDataDate}</span>`;
+      dataDateElement.style.display = 'block';
     }
 
     function calculateTrendLine(data) {
