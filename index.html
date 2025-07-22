@@ -497,8 +497,19 @@
               },
               ticks: {
                 callback: function(value, index) {
-                  const skipRate = isMobile ? 90 : 63;
-                  return index % skipRate === 0 || index === dates.length - 1 ? dates[index].substring(5) : '';
+                  // 計算大約每6個月顯示一次的間隔
+                  const totalDays = dates.length;
+                  const monthsToShow = selectedYears * 2; // 每年2次，相當於6個月間隔
+                  const skipRate = Math.floor(totalDays / monthsToShow);
+                  
+                  // 確保至少每30天顯示一次，最多每180天顯示一次
+                  const finalSkipRate = Math.max(30, Math.min(180, skipRate));
+                  
+                  // 顯示第一個、最後一個，以及按間隔的日期
+                  if (index === 0 || index === dates.length - 1 || index % finalSkipRate === 0) {
+                    return dates[index].substring(5); // 只顯示月-日
+                  }
+                  return '';
                 },
                 maxRotation: 45,
                 minRotation: 45,
