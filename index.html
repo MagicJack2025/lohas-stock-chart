@@ -263,9 +263,25 @@
       title.innerHTML = `${stockName} (${document.getElementById('symbolInput').value.toUpperCase()}) - 樂活五線譜-3.5年版`;
       const dates = data.map(entry => entry.date);
       const closes = data.map(entry => parseFloat(entry.close));
+      
+      // 確保有足夠的數據點
+      if (closes.length < 10) {
+        updateStatus('數據點不足，無法繪製五線譜');
+        return;
+      }
+      
       const trendLine = calculateTrendLine(closes);
       const errors = closes.map((value, i) => value - trendLine[i]);
-      const stdDev = calculateStandardDeviation(errors);
+      let stdDev = calculateStandardDeviation(errors);
+      
+      // 如果標準差太小，使用價格範圍的一定比例
+      const priceRange = Math.max(...closes) - Math.min(...closes);
+      const minStdDev = priceRange * 0.02; // 至少是價格範圍的2%
+      if (stdDev < minStdDev) {
+        stdDev = minStdDev;
+        console.log('標準差太小，已調整為價格範圍的2%');
+      }
+      
       const trendPlus1 = trendLine.map(y => y + stdDev);
       const trendMinus1 = trendLine.map(y => y - stdDev);
       const trendPlus2 = trendLine.map(y => y + 2 * stdDev);
@@ -281,12 +297,12 @@
         data: {
           labels: dates,
           datasets: [
-            { label: "收盤價", data: closes, borderColor: 'rgba(0, 0, 255, 1)', borderWidth: isMobile ? 2 : 3, tension: 0.3, pointRadius: 0 },
-            { label: "趨勢線", data: trendLine, borderColor: 'rgba(255, 99, 132, 1)', borderWidth: isMobile ? 1.5 : 2, tension: 0.1, pointRadius: 0 },
-            { label: "+1σ", data: trendPlus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0 },
-            { label: "-1σ", data: trendMinus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0 },
-            { label: "+2σ", data: trendPlus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0 },
-            { label: "-2σ", data: trendMinus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0 }
+            { label: "收盤價", data: closes, borderColor: 'rgba(0, 0, 255, 1)', borderWidth: isMobile ? 2 : 3, tension: 0.3, pointRadius: 0, fill: false },
+            { label: "趨勢線", data: trendLine, borderColor: 'rgba(255, 99, 132, 1)', borderWidth: isMobile ? 1.5 : 2, tension: 0.1, pointRadius: 0, fill: false },
+            { label: "+1σ", data: trendPlus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0, fill: false },
+            { label: "-1σ", data: trendMinus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0, fill: false },
+            { label: "+2σ", data: trendPlus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0, fill: false },
+            { label: "-2σ", data: trendMinus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0, fill: false }
           ]
         },
         options: {
