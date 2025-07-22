@@ -185,7 +185,7 @@
     <button onclick="fetchStockData()">繪製樂活五線譜</button>
   </div>
   <div id="mainTitle">樂活五線譜</div>
-  <div id="versionInfo">Web v1.08 (2025-07-22)</div>
+  <div id="versionInfo">Web v1.09 (2025-07-22)</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
   <div class="container" id="chartContainer">
@@ -222,17 +222,30 @@
           const quote = jsonData2.quoteType.result[0];
           stockName = quote.longName || quote.shortName || symbol;
         }
-        const data = timestamps.map((ts, i) => ({
-          date: new Date(ts * 1000).toISOString().split('T')[0],
-          close: parseFloat(closes[i]).toFixed(1)
-        }));
+        const data = timestamps.map((ts, i) => {
+          const close = closes[i];
+          if (close === null || close === undefined || isNaN(close)) {
+            return null; // 跳過無效數據
+          }
+          return {
+            date: new Date(ts * 1000).toISOString().split('T')[0],
+            close: parseFloat(close).toFixed(2)
+          };
+        }).filter(item => item !== null); // 移除無效數據
         const today = new Date();
         const endDate = today.toISOString().split('T')[0];
         const startDate = new Date();
         startDate.setFullYear(startDate.getFullYear() - 3);
         startDate.setMonth(startDate.getMonth() - 6);
         const startDateStr = startDate.toISOString().split('T')[0];
-        const filteredData = data.filter(d => d.date >= startDateStr && d.date <= endDate);
+        const filteredData = data.filter(d => d && d.date >= startDateStr && d.date <= endDate);
+        
+        console.log('數據過濾結果:', {
+          原始數據點: data.length,
+          過濾後數據點: filteredData.length,
+          開始日期: startDateStr,
+          結束日期: endDate
+        });
         drawChart({ stockName, stockData: filteredData });
       } catch (err) {
         updateStatus('API 無法獲取數據，請稍後再試');
@@ -418,18 +431,60 @@
     }
 
     function calculateTrendLine(data) {
-      let n = data.length, sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-      for (let i = 0; i < n; i++) { sumX += i; sumY += data[i]; sumXY += i * data[i]; sumXX += i * i; }
-      let slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+      let n = data.length;
+      if (n === 0) return [];
+      
+      let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+      
+      // 確保所有數據都是有效數字
+      const validData = data.filter(val => !isNaN(val) && isFinite(val));
+      if (validData.length < 2) {
+        console.log('警告：有效數據點不足，無法計算趨勢線');
+        return data.map(() => 0);
+      }
+      
+      n = validData.length;
+      
+      for (let i = 0; i < n; i++) { 
+        sumX += i; 
+        sumY += validData[i]; 
+        sumXY += i * validData[i]; 
+        sumXX += i * i; 
+      }
+      
+      const denominator = (n * sumXX - sumX * sumX);
+      if (denominator === 0) {
+        console.log('警告：趨勢線計算分母為0，返回平均值');
+        const avg = sumY / n;
+        return data.map(() => avg);
+      }
+      
+      let slope = (n * sumXY - sumX * sumY) / denominator;
       let intercept = (sumY - slope * sumX) / n;
+      
+      console.log('趨勢線計算:', { slope, intercept, n, sumX, sumY, sumXY, sumXX });
+      
       return data.map((_, i) => slope * i + intercept);
     }
 
     function calculateStandardDeviation(errors) {
-      let n = errors.length;
-      let mean = errors.reduce((sum, value) => sum + value, 0) / n;
-      let variance = errors.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / n;
-      return Math.sqrt(variance);
+      if (!errors || errors.length === 0) return 0;
+      
+      // 過濾掉 NaN 值
+      const validErrors = errors.filter(val => !isNaN(val) && isFinite(val));
+      if (validErrors.length === 0) {
+        console.log('警告：沒有有效的誤差數據');
+        return 0;
+      }
+      
+      let n = validErrors.length;
+      let mean = validErrors.reduce((sum, value) => sum + value, 0) / n;
+      let variance = validErrors.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / n;
+      
+      const stdDev = Math.sqrt(variance);
+      console.log('標準差計算:', { n, mean, variance, stdDev });
+      
+      return stdDev;
     }
 
     function getTodayInTaipei() {
