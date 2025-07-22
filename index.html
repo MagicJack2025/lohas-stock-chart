@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>樂活五線譜-3.5年版</title>
+  
+  <!-- PWA 和 iOS 圖示設定 -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="樂活五線譜">
+  
+  <!-- 自定義圖示 -->
+  <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxkZWZzPgo8bGluZWFyR3JhZGllbnQgaWQ9ImJnR3JhZGllbnQiIHgxPSIwJSIgeTE9IjAlIiB4Mj0iMTAwJSIgeTI9IjEwMCUiPgo8c3RvcCBvZmZzZXQ9IjAlIiBzdHlsZT0ic3RvcC1jb2xvcjojMDA3QkZGO3N0b3Atb3BhY2l0eToxIiAvPgo8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiMwMDU2YjM7c3RvcC1vcGFjaXR5OjEiIC8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPCEtLSDono3mmK/lnZnmqJnkuK0gLS0+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iMjAiIGZpbGw9InVybCgjYmdHcmFkaWVudCkiLz4KPCEtLSDnmb3oibLkupTnt5rlrp4gLS0+CjxyZWN0IHg9IjIwIiB5PSI2MCIgd2lkdGg9IjE0MCIgaGVpZ2h0PSI4MCIgcng9IjgiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuMSIvPgo8IS0tIOe3muS7tiAtLT4KPCEtLSDnlKjmmIborqHmiJDnmoTmsqHnpbo6IOiXjeiJsijkuLvnnaHvvInvvIzntaLivaXnt5rlnJfvvIjmmK/nkZ7nvJjvvInvvIwrMc+D77yM77yNMc+D77yMKzLPg++8jO+8jTLPgyAtLT4KPGxpbmUgeDE9IjMwIiB5MT0iMTMwIiB4Mj0iMTUwIiB5Mj0iNzAiIHN0cm9rZT0iIzUwQ0Q1MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSIzLDMiLz4KPGxpbmUgeDE9IjMwIiB5MT0iMTIwIiB4Mj0iMTUwIiB5Mj0iODAiIHN0cm9rZT0iI0ZGQTUwMCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSIzLDMiLz4KPGxpbmUgeDE9IjMwIiB5MT0iMTEwIiB4Mj0iMTUwIiB5Mj0iOTAiIHN0cm9rZT0iI0ZGNjM5OSIgc3Ryb2tlLXdpZHRoPSIzIi8+CjxsaW5lIHgxPSIzMCIgeTE9IjEwMCIgeDI9IjE1MCIgeTI9IjEwMCIgc3Ryb2tlPSIjRkZBNTAwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjMsMyIvPgo8bGluZSB4MT0iMzAiIHkxPSI5MCIgeDI9IjE1MCIgeTI9IjExMCIgc3Ryb2tlPSIjNTBDRDUwIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1kYXNoYXJyYXk9IjMsMyIvPgo8IS0tIOaUtuebpOWDuSAtLT4KPHBhdGggZD0iTTMwIDExNSBMNDAgMTIwIEw1MCAxMTAgTDYwIDEwNSBMNzAgMTAwIEw4MCA5NSBMOTAgMTAwIEwxMDAgOTUgTDExMCA5MCBMMTIwIDkwIEwxMzAgODUgTDE0MCA5MCBMMTUwIDg1IiBzdHJva2U9IiMwMDAwRkYiIHN0cm9rZS13aWR0aD0iMyIgZmlsbD0ibm9uZSIvPgo8IS0tIOaWh+WtlyAtLT4KPHR0ZXh0IHg9IjkwIiB5PSI0NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiPuaihOa0u+S6lOe3muitrTwvdGV4dD4KPHR0ZXh0IHg9IjkwIiB5PSIxNjAiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IndoaXRlIj5MaXZlIENoYXJ0PC90ZXh0Pgo8L3N2Zz4=">
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -176,7 +185,7 @@
     <button onclick="fetchStockData()">繪製樂活五線譜</button>
   </div>
   <div id="mainTitle">樂活五線譜</div>
-  <div id="versionInfo">Web v1.06 (2025-07-20)</div>
+  <div id="versionInfo">Web v1.06 (2025-07-22)</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
   <div class="container" id="chartContainer">
