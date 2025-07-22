@@ -9,23 +9,25 @@
     body {
       font-family: Arial, sans-serif;
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       overflow-x: hidden;
       padding: 10px;
       box-sizing: border-box;
+      background-color: #f8f9fa;
     }
     .search-container {
       display: flex;
       flex-direction: column;
       align-items: stretch;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 15px;
+      max-width: 100%;
     }
     .search-container input, .search-container button {
-      padding: 10px;
+      padding: 12px;
       font-size: 16px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
       box-sizing: border-box;
     }
     .search-container button {
@@ -33,46 +35,110 @@
       background-color: #007BFF;
       border: none;
       cursor: pointer;
+      font-weight: bold;
     }
     .search-container button:hover {
       background-color: #0056b3;
     }
     #stockTitle {
       display: none;
-      margin-top: 10px;
+      margin: 15px 0;
       text-align: center;
-      font-size: 24px;
+      font-size: clamp(16px, 4vw, 24px);
       font-weight: bold;
       color: #003366;
-      white-space: nowrap;
+      line-height: 1.2;
+      word-break: break-word;
     }
     #mainTitle {
       text-align: center;
-      font-size: 48px;
+      font-size: clamp(24px, 8vw, 48px);
       font-weight: bold;
       color: #003366;
       margin: 20px 0;
     }
     #statusMessage {
       text-align: center;
-      font-size: 18px;
+      font-size: clamp(14px, 3.5vw, 18px);
       color: #003366;
       font-weight: bold;
-      margin: 10px 0;
+      margin: 15px 0;
+      padding: 10px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     #statusMessage span {
       color: #FF4500;
     }
     .container {
       width: 100%;
-      max-width: 600px;
       margin: 0 auto;
       text-align: center;
       display: none;
+      background-color: white;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .chart-wrapper {
+      position: relative;
+      width: 100%;
+      height: 60vh;
+      min-height: 300px;
+      max-height: 500px;
     }
     canvas {
-      max-width: 100%;
-      height: auto;
+      width: 100% !important;
+      height: 100% !important;
+    }
+    
+    /* 手機版特殊樣式 */
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      .search-container {
+        margin-bottom: 10px;
+      }
+      .search-container input, .search-container button {
+        padding: 14px;
+        font-size: 16px;
+      }
+      .container {
+        padding: 10px;
+        border-radius: 8px;
+      }
+      .chart-wrapper {
+        height: 50vh;
+        min-height: 280px;
+      }
+      #stockTitle {
+        font-size: 14px;
+        margin: 10px 0;
+      }
+      #mainTitle {
+        font-size: 28px;
+        margin: 15px 0;
+      }
+      #statusMessage {
+        font-size: 14px;
+        padding: 8px;
+        margin: 10px 0;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .chart-wrapper {
+        height: 45vh;
+        min-height: 250px;
+      }
+      #stockTitle {
+        font-size: 12px;
+      }
+      #mainTitle {
+        font-size: 24px;
+      }
     }
   </style>
 </head>
@@ -85,7 +151,9 @@
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
   <div class="container" id="chartContainer">
-    <canvas id="stockChart"></canvas>
+    <div class="chart-wrapper">
+      <canvas id="stockChart"></canvas>
+    </div>
   </div>
 
   <script>
@@ -141,11 +209,11 @@
     function clearPreviousChart() {
       document.getElementById('chartContainer').style.display = "block";
       if (chartInstance !== null) { chartInstance.destroy(); chartInstance = null; }
-      const canvasContainer = document.getElementById('chartContainer');
+      const chartWrapper = document.querySelector('.chart-wrapper');
       const oldCanvas = document.getElementById('stockChart');
       const newCanvas = document.createElement('canvas');
       newCanvas.id = 'stockChart';
-      canvasContainer.replaceChild(newCanvas, oldCanvas);
+      chartWrapper.replaceChild(newCanvas, oldCanvas);
     }
 
     function drawChart(response) {
@@ -164,14 +232,19 @@
       const trendMinus1 = trendLine.map(y => y - stdDev);
       const trendPlus2 = trendLine.map(y => y + 2 * stdDev);
       const trendMinus2 = trendLine.map(y => y - 2 * stdDev);
+      
       const ctx = document.getElementById('stockChart').getContext('2d');
+      
+      // 檢測是否為手機裝置
+      const isMobile = window.innerWidth <= 768;
+      
       chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: dates,
           datasets: [
-            { label: "收盤價", data: closes, borderColor: 'rgba(0, 0, 255, 1)', borderWidth: 3, tension: 0.3, pointRadius: 0 },
-            { label: "趨勢線", data: trendLine, borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2, tension: 0.1, pointRadius: 0 },
+            { label: "收盤價", data: closes, borderColor: 'rgba(0, 0, 255, 1)', borderWidth: isMobile ? 2 : 3, tension: 0.3, pointRadius: 0 },
+            { label: "趨勢線", data: trendLine, borderColor: 'rgba(255, 99, 132, 1)', borderWidth: isMobile ? 1.5 : 2, tension: 0.1, pointRadius: 0 },
             { label: "+1σ", data: trendPlus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0 },
             { label: "-1σ", data: trendMinus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0 },
             { label: "+2σ", data: trendPlus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0 },
@@ -180,32 +253,79 @@
         },
         options: {
           responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
           plugins: {
             legend: {
               display: true,
               position: 'top',
               labels: {
                 usePointStyle: false,
-                boxWidth: 20,
+                boxWidth: isMobile ? 15 : 20,
                 boxHeight: 2,
-                font: { size: 14, weight: 'bold' },
-                padding: 15
+                font: { 
+                  size: isMobile ? 10 : 14, 
+                  weight: 'bold' 
+                },
+                padding: isMobile ? 8 : 15
+              }
+            },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              titleFont: {
+                size: isMobile ? 10 : 12
+              },
+              bodyFont: {
+                size: isMobile ? 9 : 11
               }
             }
           },
           scales: {
             x: {
-              title: { display: true, text: '日期' },
+              title: { 
+                display: !isMobile, 
+                text: '日期',
+                font: {
+                  size: isMobile ? 10 : 12
+                }
+              },
               ticks: {
                 callback: function(value, index) {
-                  return index % 63 === 0 || index === dates.length - 1 ? dates[index] : '';
+                  const skipRate = isMobile ? 90 : 63;
+                  return index % skipRate === 0 || index === dates.length - 1 ? dates[index].substring(5) : '';
                 },
                 maxRotation: 45,
                 minRotation: 45,
-                autoSkip: false
+                autoSkip: false,
+                font: {
+                  size: isMobile ? 8 : 10
+                }
+              },
+              grid: {
+                display: !isMobile
               }
             },
-            y: { title: { display: true, text: '收盤價' } }
+            y: { 
+              title: { 
+                display: !isMobile, 
+                text: '收盤價',
+                font: {
+                  size: isMobile ? 10 : 12
+                }
+              },
+              ticks: {
+                font: {
+                  size: isMobile ? 8 : 10
+                }
+              },
+              grid: {
+                color: 'rgba(0,0,0,0.1)'
+              }
+            }
           }
         }
       });
@@ -235,6 +355,24 @@
       const day = String(taipeiDate.getDate()).padStart(2, '0');
       return `${year}-${month}-${day}`;
     }
+
+    // 監聽螢幕旋轉和視窗大小變化
+    window.addEventListener('resize', function() {
+      if (chartInstance) {
+        setTimeout(() => {
+          chartInstance.resize();
+        }, 100);
+      }
+    });
+
+    // 監聽方向變化（手機旋轉）
+    window.addEventListener('orientationchange', function() {
+      setTimeout(() => {
+        if (chartInstance) {
+          chartInstance.resize();
+        }
+      }, 500);
+    });
   </script>
 </body>
 </html>
