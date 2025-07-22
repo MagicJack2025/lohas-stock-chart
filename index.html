@@ -55,7 +55,14 @@
       font-size: clamp(24px, 8vw, 48px);
       font-weight: bold;
       color: #003366;
-      margin: 20px 0;
+      margin: 20px 0 5px 0;
+    }
+    #versionInfo {
+      text-align: center;
+      font-size: clamp(12px, 2.5vw, 16px);
+      color: #FF4500;
+      font-weight: bold;
+      margin: 0 0 20px 0;
     }
     #statusMessage {
       text-align: center;
@@ -67,17 +74,17 @@
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
     }
     #statusMessage .query-date {
       color: #FF4500;
+      display: block;
+      margin-bottom: 5px;
     }
     #statusMessage .data-date {
       color: #007BFF;
       font-size: clamp(11px, 2.8vw, 14px);
       font-weight: normal;
+      display: block;
     }
     #statusMessage .data-date span {
       color: #007BFF;
@@ -90,17 +97,16 @@
       display: none;
       background-color: white;
       border-radius: 12px;
-      padding: 15px;
+      padding: 15px 5px;
       box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .chart-wrapper {
       position: relative;
-      width: 100%;
+      width: calc(100% - 20px);
       height: 60vh;
       min-height: 300px;
       max-height: 500px;
-      padding: 0 15px;
-      box-sizing: border-box;
+      margin: 0 10px;
     }
     canvas {
       width: 100% !important;
@@ -133,13 +139,19 @@
       }
       #mainTitle {
         font-size: 28px;
-        margin: 15px 0;
+        margin: 15px 0 5px 0;
+      }
+      #versionInfo {
+        font-size: 12px;
+        margin: 0 0 15px 0;
       }
       #statusMessage {
         font-size: 12px;
         padding: 8px;
         margin: 10px 0;
-        gap: 6px;
+      }
+      #statusMessage .query-date {
+        margin-bottom: 4px;
       }
       #statusMessage .data-date {
         font-size: 11px;
@@ -157,10 +169,16 @@
       #mainTitle {
         font-size: 24px;
       }
+      #versionInfo {
+        font-size: 11px;
+      }
       #statusMessage {
         font-size: 11px;
       }
-      #dataDate {
+      #statusMessage .query-date {
+        margin-bottom: 3px;
+      }
+      #statusMessage .data-date {
         font-size: 10px;
       }
     }
@@ -172,9 +190,9 @@
     <button onclick="fetchStockData()">繪製圖表</button>
   </div>
   <div id="mainTitle">樂活五線譜</div>
+  <div id="versionInfo">v1.01</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
-  <div id="dataDate" style="display: none;"></div>
   <div class="container" id="chartContainer">
     <div class="chart-wrapper">
       <canvas id="stockChart"></canvas>
@@ -233,7 +251,6 @@
 
     function clearPreviousChart() {
       document.getElementById('chartContainer').style.display = "block";
-      document.getElementById('dataDate').style.display = "none";
       if (chartInstance !== null) { chartInstance.destroy(); chartInstance = null; }
       const chartWrapper = document.querySelector('.chart-wrapper');
       const oldCanvas = document.getElementById('stockChart');
@@ -356,14 +373,9 @@
         }
       });
       
-      // 顯示查詢日期和資料日期
-      updateStatus(`查詢日期: <span>${getTodayInTaipei()}</span>`);
-      
-      // 顯示最後一筆資料的日期
+      // 顯示查詢日期和資料日期（整合為一列）
       const lastDataDate = dates[dates.length - 1];
-      const dataDateElement = document.getElementById('dataDate');
-      dataDateElement.innerHTML = `資料日期: <span>${lastDataDate}</span>`;
-      dataDateElement.style.display = 'block';
+      updateStatus(`<div class="query-date">查詢日期: ${getTodayInTaipei()}</div><div class="data-date">資料日期: <span>${lastDataDate}</span></div>`);
     }
 
     function calculateTrendLine(data) {
