@@ -67,22 +67,19 @@
       background-color: white;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
     }
-    #statusMessage span {
+    #statusMessage .query-date {
       color: #FF4500;
     }
-    #dataDate {
-      text-align: center;
+    #statusMessage .data-date {
+      color: #007BFF;
       font-size: clamp(11px, 2.8vw, 14px);
-      color: #666666;
       font-weight: normal;
-      margin: 5px 0 15px 0;
-      padding: 8px;
-      background-color: #f0f8ff;
-      border-radius: 6px;
-      border-left: 4px solid #007BFF;
     }
-    #dataDate span {
+    #statusMessage .data-date span {
       color: #007BFF;
       font-weight: bold;
     }
@@ -102,6 +99,8 @@
       height: 60vh;
       min-height: 300px;
       max-height: 500px;
+      padding: 0 15px;
+      box-sizing: border-box;
     }
     canvas {
       width: 100% !important;
@@ -140,11 +139,10 @@
         font-size: 12px;
         padding: 8px;
         margin: 10px 0;
+        gap: 6px;
       }
-      #dataDate {
+      #statusMessage .data-date {
         font-size: 11px;
-        padding: 6px;
-        margin: 5px 0 10px 0;
       }
     }
     
