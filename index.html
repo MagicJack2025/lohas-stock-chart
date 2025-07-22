@@ -185,7 +185,7 @@
     <button onclick="fetchStockData()">繪製樂活五線譜</button>
   </div>
   <div id="mainTitle">樂活五線譜</div>
-  <div id="versionInfo">Web v1.07 (2025-07-22)</div>
+  <div id="versionInfo">Web v1.08 (2025-07-22)</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
   <div class="container" id="chartContainer">
@@ -264,6 +264,12 @@
       const dates = data.map(entry => entry.date);
       const closes = data.map(entry => parseFloat(entry.close));
       
+      // 調試信息
+      console.log('=== 調試信息 ===');
+      console.log('數據點數量:', closes.length);
+      console.log('前5個收盤價:', closes.slice(0, 5));
+      console.log('收盤價範圍:', Math.min(...closes), '到', Math.max(...closes));
+      
       // 確保有足夠的數據點
       if (closes.length < 10) {
         updateStatus('數據點不足，無法繪製五線譜');
@@ -271,21 +277,35 @@
       }
       
       const trendLine = calculateTrendLine(closes);
+      console.log('前5個趨勢線值:', trendLine.slice(0, 5));
+      
       const errors = closes.map((value, i) => value - trendLine[i]);
       let stdDev = calculateStandardDeviation(errors);
+      console.log('原始標準差:', stdDev);
       
       // 如果標準差太小，使用價格範圍的一定比例
       const priceRange = Math.max(...closes) - Math.min(...closes);
       const minStdDev = priceRange * 0.02; // 至少是價格範圍的2%
+      console.log('價格範圍:', priceRange, '最小標準差:', minStdDev);
+      
       if (stdDev < minStdDev) {
         stdDev = minStdDev;
-        console.log('標準差太小，已調整為價格範圍的2%');
+        console.log('標準差太小，已調整為:', stdDev);
       }
       
       const trendPlus1 = trendLine.map(y => y + stdDev);
       const trendMinus1 = trendLine.map(y => y - stdDev);
       const trendPlus2 = trendLine.map(y => y + 2 * stdDev);
       const trendMinus2 = trendLine.map(y => y - 2 * stdDev);
+      
+      console.log('五線譜範圍檢查:');
+      console.log('收盤價:', Math.min(...closes), '-', Math.max(...closes));
+      console.log('趨勢線:', Math.min(...trendLine), '-', Math.max(...trendLine));
+      console.log('+1σ:', Math.min(...trendPlus1), '-', Math.max(...trendPlus1));
+      console.log('-1σ:', Math.min(...trendMinus1), '-', Math.max(...trendMinus1));
+      console.log('+2σ:', Math.min(...trendPlus2), '-', Math.max(...trendPlus2));
+      console.log('-2σ:', Math.min(...trendMinus2), '-', Math.max(...trendMinus2));
+      console.log('=================');
       
       const ctx = document.getElementById('stockChart').getContext('2d');
       
