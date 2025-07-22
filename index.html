@@ -5,6 +5,239 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>樂活五線譜-3.5年版</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>body{font-family:Arial,sans-serif;margin:0;height:100vh;overflow:hidden}.search-container{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:10px}.search-container input{padding:8px;font-size:16px;border:1px solid #ccc;border-radius:5px;width:180px}.search-container button{padding:8px 12px;font-size:16px;color:white;background-color:#007BFF;border:none;border-radius:5px;cursor:pointer;transition:background-color .3s}.search-container button:hover{background-color:#0056b3}#stockTitle{display:none;margin-top:70px;text-align:center;font-size:36px;font-weight:700;color:#003366;white-space:nowrap}#mainTitle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-size:128px;font-weight:700;color:#003366;margin:0}#statusMessage{text-align:center;font-size:22px;color:#003366;font-weight:700;margin-top:10px}#statusMessage span{color:#FF4500}.container{width:80%;margin:20px auto;text-align:center;display:none}canvas{max-width:100%;height:auto}</style>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; height: 100vh; overflow: hidden; }
+    .search-container {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .search-container input {
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 180px;
+    }
+    .search-container button {
+      padding: 8px 12px;
+      font-size: 16px;
+      color: white;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .search-container button:hover { background-color: #0056b3; }
+    #stockTitle { display: none; margin-top: 70px; text-align: center; font-size: 36px; font-weight: bold; color: #003366; white-space: nowrap; }
+    #mainTitle { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; font-size: 128px; font-weight: bold; color: #003366; margin: 0; }
+    #statusMessage { text-align: center; font-size: 22px; color: #003366; font-weight: bold; margin-top: 10px; }
+    #statusMessage span { color: #FF4500; }
+    .container { width: 80%; margin: 20px auto; text-align: center; display: none; }
+    canvas { max-width: 100%; height: auto; }
+  </style>
 </head>
-<body><div class="search-container"><input type="text" id="symbolInput" placeholder="輸入股票代碼 (如 2330.TW)"><button onclick="fetchStockData()">繪製圖表</button></div><div id="mainTitle">樂活五線譜</div><h1 id="stockTitle">樂活五線譜-3.5年版</h1><div id="statusMessage"></div><div class="container" id="chartContainer"><canvas id="stockChart"></canvas></div><script>let chartInstance=null;async function fetchStockData(){const e=document.getElementById("symbolInput").value.toUpperCase();if(!e)return void alert("請輸入股票代碼");updateStatus("取得股價中..."),clearPreviousChart(),document.getElementById("mainTitle").style.display="none",document.getElementById("stockTitle").style.display="block";try{const t=`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(e)}?interval=1d&range=5y`,a=await fetch(t),n=await a.json();if(!n.chart||!n.chart.result)return void updateStatus("獲取歷史數據失敗，請檢查股票代碼是否正確");const r=n.chart.result[0],c=r.timestamp,s=r.indicators.quote[0].close;if(!c||!s)return void updateStatus("無法獲取收盤價數據");const o=`https://query1.finance.yahoo.com/v1/finance/quoteType/${encodeURIComponent(e)}?formatted=true&lang=zh-Hant-HK&region=HK`,d=await fetch(o),l=await d.json();let i=e;if(l.quoteType?.result?.length>0){const e=l.quoteType.result[0];i=e.longName||e.shortName||e}const u=c.map((e,t)=>({date:new Date(1e3*e).toISOString().split("T")[0],close:parseFloat(s[t]).toFixed(1)})),m=new Date,h=m.toISOString().split("T")[0],g=new Date;g.setFullYear(g.getFullYear()-3),g.setMonth(g.getMonth()-6);const p=g.toISOString().split("T")[0],b=u.filter(e=>e.date>=p&&e.date<=h);drawChart({stockName:i,stockData:b})}catch(e){updateStatus("API 無法獲取數據，請稍後再試"),console.error(e)}}function updateStatus(e){document.getElementById("statusMessage").innerHTML=e}function clearPreviousChart(){document.getElementById("chartContainer").style.display="block",null!==chartInstance&&(chartInstance.destroy(),chartInstance=null);const e=document.getElementById("chartContainer"),t=document.getElementById("stockChart"),a=document.createElement("canvas");a.id="stockChart",e.replaceChild(a,t)}function drawChart(e){if(!e||e.error||!e.stockData||0===e.stockData.length)return;const t=e.stockName,a=e.stockData,n=document.getElementById("stockTitle");n.innerHTML=`${t} (${document.getElementById("symbolInput").value.toUpperCase()}) - 樂活五線譜-3.5年版`;const r=a.map(e=>e.date),c=a.map(e=>parseFloat(e.close)),s=calculateTrendLine(c),o=c.map((e,t)=>e-s[t]),d=calculateStandardDeviation(o),l=s.map(e=>e+d),i=s.map(e=>e-d),u=s.map(e=>e+2*d),m=s.map(e=>e-2*d),h=document.getElementById("stockChart").getContext("2d");chartInstance=new Chart(h,{type:"line",data:{labels:r,datasets:[{label:"收盤價",data:c,borderColor:"rgba(0, 0, 255, 1)",borderWidth:3,tension:.3,pointRadius:0},{label:"趨勢線",data:s,borderColor:"rgba(255, 99, 132, 1)",borderWidth:2,tension:.1,pointRadius:0},{label:"+1σ",data:l,borderColor:"rgba(255, 165, 0, 1)",borderWidth:1,pointRadius:0},{label:"-1σ",data:i,borderColor:"rgba(255, 165, 0, 1)",borderWidth:1,pointRadius:0},{label:"+2σ",data:u,borderColor:"rgba(50, 205, 50, 1)",borderWidth:1,pointRadius:0},{label:"-2σ",data:m,borderColor:"rgba(50, 205, 50, 1)",borderWidth:1,pointRadius:0}]},options:{responsive:!0,plugins:{legend:{display:!0,position:"top",labels:{usePointStyle:!1,generateLabels:function(e){return e.data.datasets.map(((t,a)=>({text:t.label,strokeStyle:t.borderColor,lineWidth:t.borderWidth,hidden:!e.isDatasetVisible(a),index:a})))},boxWidth:20,boxHeight:2,font:{size:14,weight:"bold"},padding:15}}},scales:{x:{title:{display:!0,text:"日期"},ticks:{callback:function(e,t){return t%63==0||t===r.length-1?r[t]:""},maxRotation:45,minRotation:45,autoSkip:!1},grid:{display:!0,drawOnChartArea:!0,drawTicks:!1,drawBorder:!0,borderColor:"rgba(150, 150, 150, 0.5)",borderWidth:1,color:function(e){return e.index%63==0||e.index===r.length-1?"rgba(150, 150, 150, 0.5)":"transparent"},lineWidth:function(e){return e.index%63==0||e.index===r.length-1?1:0}}},y:{title:{display:!0,text:"收盤價"}}}}}),updateStatus(`查詢日期: <span>${getTodayInTaipei()}</span>`)}function calculateTrendLine(e){let t=e.length,a=0,n=0,r=0,c=0;for(let s=0;s<t;s++)a+=s,n+=e[s],r+=s*e[s],c+=s*s;let s=(t*r-a*n)/(t*c-a*a),o=(n-s*a)/t;return e.map(((e,t)=>s*t+o))}function calculateStandardDeviation(e){let t=e.length,a=e.reduce(((e,t)=>e+t),0)/t,n=e.reduce(((e,t)=>e+Math.pow(t-a,2)),0)/t;return Math.sqrt(n)}function getTodayInTaipei(){const e=new Date,t=new Date(e.toLocaleString("en-US",{timeZone:"Asia/Taipei"}));return`${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,"0")}-${String(t.getDate()).padStart(2,"0")}`}</script></body></html>
+<body>
+  <div class="search-container">
+    <input type="text" id="symbolInput" placeholder="輸入股票代碼 (如 2330.TW)">
+    <button onclick="fetchStockData()">繪製圖表</button>
+  </div>
+  <div id="mainTitle">樂活五線譜</div>
+  <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
+  <div id="statusMessage"></div>
+  <div class="container" id="chartContainer">
+    <canvas id="stockChart"></canvas>
+  </div>
+
+  <script>
+    let chartInstance = null;
+
+    async function fetchStockData() {
+      const symbol = document.getElementById('symbolInput').value.toUpperCase();
+      if (!symbol) { alert('請輸入股票代碼'); return; }
+      updateStatus('取得股價中...');
+      clearPreviousChart();
+      document.getElementById('mainTitle').style.display = 'none';
+      document.getElementById('stockTitle').style.display = 'block';
+      try {
+        const proxy = 'https://corsproxy.io/?';
+        const apiUrl1 = `${proxy}https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5y`;
+        const response1 = await fetch(apiUrl1);
+        const jsonData1 = await response1.json();
+
+        if (!jsonData1.chart || !jsonData1.chart.result) {
+          return void updateStatus('獲取歷史數據失敗，請檢查股票代碼是否正確');
+        }
+
+        const result = jsonData1.chart.result[0];
+        const timestamps = result.timestamp;
+        const closes = result.indicators.quote[0].close;
+
+        if (!timestamps || !closes) {
+          return void updateStatus('無法獲取收盤價數據');
+        }
+
+        const apiUrl2 = `${proxy}https://query1.finance.yahoo.com/v1/finance/quoteType/${encodeURIComponent(symbol)}?formatted=true&lang=zh-Hant-HK&region=HK`;
+        const response2 = await fetch(apiUrl2);
+        const jsonData2 = await response2.json();
+
+        let stockName = symbol;
+        if (jsonData2.quoteType?.result?.length > 0) {
+          const quote = jsonData2.quoteType.result[0];
+          stockName = quote.longName || quote.shortName || symbol;
+        }
+
+        const data = timestamps.map((ts, i) => ({
+          date: new Date(ts * 1000).toISOString().split('T')[0],
+          close: parseFloat(closes[i]).toFixed(1)
+        }));
+
+        const today = new Date();
+        const endDate = today.toISOString().split('T')[0];
+        const startDate = new Date();
+        startDate.setFullYear(startDate.getFullYear() - 3);
+        startDate.setMonth(startDate.getMonth() - 6);
+        const startDateStr = startDate.toISOString().split('T')[0];
+
+        const filteredData = data.filter(d => d.date >= startDateStr && d.date <= endDate);
+
+        drawChart({ stockName, stockData: filteredData });
+
+      } catch (err) {
+        updateStatus('API 無法獲取數據，請稍後再試');
+        console.error(err);
+      }
+    }
+
+    function updateStatus(message) {
+      document.getElementById('statusMessage').innerHTML = message;
+    }
+
+    function clearPreviousChart() {
+      document.getElementById('chartContainer').style.display = "block";
+      if (chartInstance !== null) { chartInstance.destroy(); chartInstance = null; }
+      const canvasContainer = document.getElementById('chartContainer');
+      const oldCanvas = document.getElementById('stockChart');
+      const newCanvas = document.createElement('canvas');
+      newCanvas.id = 'stockChart';
+      canvasContainer.replaceChild(newCanvas, oldCanvas);
+    }
+
+    function drawChart(response) {
+      if (!response || response.error) return;
+      if (!response.stockData || response.stockData.length === 0) return;
+      const stockName = response.stockName;
+      const data = response.stockData;
+      const title = document.getElementById('stockTitle');
+      title.innerHTML = `${stockName} (${document.getElementById('symbolInput').value.toUpperCase()}) - 樂活五線譜-3.5年版`;
+      const dates = data.map(entry => entry.date);
+      const closes = data.map(entry => parseFloat(entry.close));
+      const trendLine = calculateTrendLine(closes);
+      const errors = closes.map((value, i) => value - trendLine[i]);
+      const stdDev = calculateStandardDeviation(errors);
+      const trendPlus1 = trendLine.map(y => y + stdDev);
+      const trendMinus1 = trendLine.map(y => y - stdDev);
+      const trendPlus2 = trendLine.map(y => y + 2 * stdDev);
+      const trendMinus2 = trendLine.map(y => y - 2 * stdDev);
+      const ctx = document.getElementById('stockChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [
+            { label: "收盤價", data: closes, borderColor: 'rgba(0, 0, 255, 1)', borderWidth: 3, tension: 0.3, pointRadius: 0 },
+            { label: "趨勢線", data: trendLine, borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2, tension: 0.1, pointRadius: 0 },
+            { label: "+1σ", data: trendPlus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0 },
+            { label: "-1σ", data: trendMinus1, borderColor: 'rgba(255, 165, 0, 1)', borderWidth: 1, pointRadius: 0 },
+            { label: "+2σ", data: trendPlus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0 },
+            { label: "-2σ", data: trendMinus2, borderColor: 'rgba(50, 205, 50, 1)', borderWidth: 1, pointRadius: 0 }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: false,
+                generateLabels: function(chart) {
+                  const datasets = chart.data.datasets;
+                  return datasets.map((dataset, index) => ({
+                    text: dataset.label,
+                    strokeStyle: dataset.borderColor,
+                    lineWidth: dataset.borderWidth,
+                    hidden: !chart.isDatasetVisible(index),
+                    index: index
+                  }));
+                },
+                boxWidth: 20,
+                boxHeight: 2,
+                font: { size: 14, weight: 'bold' },
+                padding: 15
+              }
+            }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: '日期' },
+              ticks: {
+                callback: function(value, index) {
+                  return index % 63 === 0 || index === dates.length - 1 ? dates[index] : '';
+                },
+                maxRotation: 45,
+                minRotation: 45,
+                autoSkip: false
+              },
+              grid: {
+                display: true,
+                drawOnChartArea: true,
+                drawTicks: false,
+                drawBorder: true,
+                borderColor: 'rgba(150, 150, 150, 0.5)',
+                borderWidth: 1,
+                color: function(context) {
+                  return context.index % 63 === 0 || context.index === dates.length - 1 ? 'rgba(150, 150, 150, 0.5)' : 'transparent';
+                },
+                lineWidth: function(context) {
+                  return context.index % 63 === 0 || context.index === dates.length - 1 ? 1 : 0;
+                }
+              }
+            },
+            y: { title: { display: true, text: '收盤價' } }
+          }
+        }
+      });
+      updateStatus(`查詢日期: <span>${getTodayInTaipei()}</span>`);
+    }
+
+    function calculateTrendLine(data) {
+      let n = data.length, sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+      for (let i = 0; i < n; i++) { sumX += i; sumY += data[i]; sumXY += i * data[i]; sumXX += i * i; }
+      let slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+      let intercept = (sumY - slope * sumX) / n;
+      return data.map((_, i) => slope * i + intercept);
+    }
+
+    function calculateStandardDeviation(errors) {
+      let n = errors.length;
+      let mean = errors.reduce((sum, value) => sum + value, 0) / n;
+      let variance = errors.reduce((sum, value) => sum + Math.pow(value - mean, 2), 0) / n;
+      return Math.sqrt(variance);
+    }
+
+    function getTodayInTaipei() {
+      const today = new Date();
+      const taipeiDate = new Date(today.toLocaleString("en-US", { timeZone: "Asia/Taipei" }));
+      const year = taipeiDate.getFullYear();
+      const month = String(taipeiDate.getMonth() + 1).padStart(2, '0');
+      const day = String(taipeiDate.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+  </script>
+</body>
+</html>
