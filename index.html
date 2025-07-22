@@ -99,7 +99,8 @@
       document.getElementById('mainTitle').style.display = 'none';
       document.getElementById('stockTitle').style.display = 'block';
       try {
-        const apiUrl1 = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5y`;
+        const proxy = 'https://corsproxy.io/?';
+        const apiUrl1 = `${proxy}https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=5y`;
         const response1 = await fetch(apiUrl1);
         const jsonData1 = await response1.json();
         if (!jsonData1.chart || !jsonData1.chart.result) { updateStatus('獲取歷史數據失敗，請檢查股票代碼是否正確'); return; }
@@ -107,7 +108,7 @@
         const timestamps = result.timestamp;
         const closes = result.indicators.quote[0].close;
         if (!timestamps || !closes) { updateStatus('無法獲取收盤價數據'); return; }
-        const apiUrl2 = `https://query1.finance.yahoo.com/v1/finance/quoteType/${encodeURIComponent(symbol)}?formatted=true&lang=zh-Hant-HK&region=HK`;
+        const apiUrl2 = `${proxy}https://query1.finance.yahoo.com/v1/finance/quoteType/${encodeURIComponent(symbol)}?formatted=true&lang=zh-Hant-HK&region=HK`;
         const response2 = await fetch(apiUrl2);
         const jsonData2 = await response2.json();
         let stockName = symbol;
