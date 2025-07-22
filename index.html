@@ -39,6 +39,15 @@
     #statusMessage span { color: #FF4500; }
     .container { width: 80%; margin: 20px auto; text-align: center; display: none; }
     canvas { max-width: 100%; height: auto; }
+
+    @media (max-width: 600px) {
+      #mainTitle { font-size: 48px; }
+      #stockTitle { font-size: 24px; }
+      .search-container { flex-direction: column; align-items: flex-start; }
+      .search-container input { width: 80%; }
+      .search-container button { width: 80%; }
+      canvas { max-width: 100%; }
+    }
   </style>
 </head>
 <body>
