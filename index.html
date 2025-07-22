@@ -61,7 +61,7 @@
     }
     #versionInfo {
       text-align: center;
-      font-size: clamp(12px, 2.5vw, 16px);
+      font-size: clamp(16px, 3.5vw, 20px);
       color: #FF4500;
       font-weight: bold;
       margin: 0 0 20px 0;
@@ -140,7 +140,7 @@
         margin: 15px 0 5px 0;
       }
       #versionInfo {
-        font-size: 12px;
+        font-size: 16px;
         margin: 0 0 15px 0;
       }
       #statusMessage {
@@ -162,7 +162,7 @@
         font-size: 24px;
       }
       #versionInfo {
-        font-size: 11px;
+        font-size: 14px;
       }
       #statusMessage {
         font-size: 11px;
@@ -173,10 +173,10 @@
 <body>
   <div class="search-container">
     <input type="text" id="symbolInput" placeholder="輸入股票代碼 (如 2330.TW)">
-    <button onclick="fetchStockData()">繪製圖表</button>
+    <button onclick="fetchStockData()">繪製樂活五線譜</button>
   </div>
   <div id="mainTitle">樂活五線譜</div>
-  <div id="versionInfo">v1.03</div>
+  <div id="versionInfo">Web v1.03</div>
   <h1 id="stockTitle">樂活五線譜-3.5年版</h1>
   <div id="statusMessage"></div>
   <div class="container" id="chartContainer">
