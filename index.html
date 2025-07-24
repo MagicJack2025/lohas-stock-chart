@@ -60,6 +60,17 @@
       border: 1px solid #ccc;
       border-radius: 8px;
       box-sizing: border-box;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      background-color: white;
+      width: 100%;
+    }
+    
+    .search-container input:focus {
+      outline: none;
+      border-color: #007BFF;
+      box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
     }
     
     .search-container button {
@@ -199,8 +210,14 @@
       }
       
       .search-container input, .search-container button {
-        padding: 14px;
+        padding: 16px;
         font-size: 16px;
+        min-height: 44px;
+      }
+      
+      .search-container input {
+        -webkit-user-select: text;
+        -webkit-touch-callout: default;
       }
       
       .container {
@@ -271,7 +288,16 @@
 </head>
 <body>
   <div class="search-container">
-    <input type="text" id="symbolInput" placeholder="輸入股票代碼 (如 2330.TW)">
+    <input 
+      type="text" 
+      id="symbolInput" 
+      placeholder="輸入股票代碼 (如 2330.TW)"
+      autocomplete="off"
+      autocorrect="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      inputmode="text"
+    >
     
     <!-- 時間範圍選擇按鈕 -->
     <div class="time-range-buttons">
@@ -296,8 +322,28 @@
     let chartInstance = null;
     let selectedYears = 3.5; // 預設3.5年
 
-    // 時間範圍選擇功能
+    // 確保輸入框在iOS上正常工作
     document.addEventListener('DOMContentLoaded', function() {
+      const symbolInput = document.getElementById('symbolInput');
+      
+      // 防止iOS縮放
+      symbolInput.addEventListener('focus', function() {
+        document.querySelector('meta[name=viewport]').setAttribute('content', 
+          'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      });
+      
+      symbolInput.addEventListener('blur', function() {
+        document.querySelector('meta[name=viewport]').setAttribute('content', 
+          'width=device-width, initial-scale=1.0');
+      });
+      
+      // 支援Enter鍵提交
+      symbolInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          fetchStockData();
+        }
+      });
+
       const timeButtons = document.querySelectorAll('.time-btn');
       timeButtons.forEach(btn => {
         btn.addEventListener('click', function() {
